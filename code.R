@@ -47,41 +47,46 @@ glimpse(df1)
 library(plm)
 library(AER)
 
-## Fixed Effects Regression
-# estimate the fixed effects regression with plm()
-# all data set
-model1 <- plm(share_national_nodes ~ treatment_int, data = df1, index = c("region", "period"),
-              model = "within")
+### Fixed / random effects regression
+# Hausman test
+phtest(plm(fragmentation_index ~ treatment_int, data = df1, index = c("region", "period"),
+           model = "within"),
+       plm(fragmentation_index ~ treatment_int, data = df1, index = c("region", "period"),
+           model = "random")) # p-value > 0.05, then use random effects
+
+# estimating the fixed effects regression with plm()
+
+model1 <- plm(fragmentation_index ~ treatment_int, data = df1, index = c("region", "period"),
+              model = "random")
 summary(model1)
-# print summary using robust standard errors
-coeftest(model1, vcov. = vcovHC, type = "HC1")
-# data set for period = 3 or 4
-model2 <- plm(share_national_nodes ~ treatment_int, data = subset(df1, period %in% c("3", "4")),
-              index = c("region", "period"), model = "within")
+coeftest(model1, vcov. = vcovHC, type = "HC1") # summary using robust standard errors
+
+# estimating the fixed effects regression with lm()
+model2 <- lm(fragmentation_index ~ treatment_int + region - 1, data = df1)
 summary(model2)
-# print summary using robust standard errors
-coeftest(model2, vcov. = vcovHC, type = "HC1")
 
 
-
-## DiD estimation
-# Create a dummy variable to indicate the time when the treatment started
+### DiD estimation
+# creating a dummy variable to indicate the time when the treatment started
 df1$time <- ifelse(as.character(df1$period) %in% c("1", "2"), 0, 1)
-# Create a dummy variable to identify the group exposed to the treatment. 
-df1$treatment_int
-# Create an interaction between time and treated. We will call this interaction ‘did’.
+# creating a dummy variable to identify the group exposed to the treatment. 
+head(df1$treatment_int, 12) # treatment is continuous
+# creating an interaction between time and treated. We will call this interaction ‘did’.
 df1$did <- df1$time * df1$treatment_int
 
-# Estimating the DID estimator (with lm)
-model1 <- lm(share_national_nodes ~ did + time, data = df1)
-summary(model1)
+# estimating the DID estimator (with lm)
+model2 <- lm(fragmentation_index ~ treatment_int * time, data = df1)
+summary(model2)
 
+head(df1$did, 12)
+head(df1$time + df1$treatment_int, 12)
+cor(df1$did, df1$time + df1$treatment_int)
 
-# Estimating the DID estimator (with plm)
-model1 <- plm(share_national_nodes ~ did + time, data = df1,
+# estimating the DID estimator (with plm)
+model3 <- plm(fragmentation_index ~ did + time, data = df1,
               index = c("region", "period"), model = "within")
-summary(model1)
-coeftest(model1, vcov. = vcovHC, type = "HC1")
+summary(model3)
+coeftest(model3, vcov. = vcovHC, type = "HC1")
 
 
 
