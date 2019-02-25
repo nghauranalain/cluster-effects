@@ -122,8 +122,7 @@ bptest(net_density ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model1) # original coefficients
-coeftest(model1, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model1, vcovHC(model1, method = "arellano")) 
+coeftest(model1, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 # assessing multicollinearity 
 car::vif(plm(net_density ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
              data = df1, index = c("region", "period"), model = "pooling"))
@@ -155,8 +154,7 @@ adf.test(df1$fragmentation_index) # If p-value < 0.05 then no unit roots present
 bptest(fragmentation_index ~ treatment_int, data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model1) # original coefficients
-coeftest(model1, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model1, vcovHC(model1, method = "arellano"))
+coeftest(model1, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
@@ -182,8 +180,7 @@ bptest(share_net_main_comp ~ treatment_int + gdp + dird + sub_region + sub_nat +
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model1) # original coefficients
-coeftest(model1, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model1, vcovHC(model1, method = "arellano")) 
+coeftest(model1, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
@@ -199,9 +196,9 @@ model1 <- plm(CC_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub
               data = df1, index = c("region", "period"), model = "random")
 summary(model1)
 ## testing for random effects: Breusch-Pagan Lagrange multiplier (LM)
-plmtest(plm(CC_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-            data = df1, index = c("region", "period"),
-            model = "pooling"), type = c("bp")) # If p-value < 0.05 then random effects model is not
+#plmtest(plm(CC_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
+ #           data = df1, index = c("region", "period"),
+  #          model = "pooling"), type = c("bp")) # If p-value < 0.05 then random effects model is not
 # appropriate (compare to a simple OLS regression)
 ## testing for unit roots/stationarity
 adf.test(df1$CC_ratio) # If p-value < 0.05 then no unit roots present
@@ -210,8 +207,7 @@ bptest(CC_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model1) # original coefficients
-coeftest(model1, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model1, vcovHC(model1, method = "arellano"))
+coeftest(model1, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
@@ -227,20 +223,13 @@ model1 <- plm(PL_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub
               data = df1, index = c("region", "period"), model = "random")
 summary(model1)
 ## testing for random effects: Breusch-Pagan Lagrange multiplier (LM)
-plmtest(plm(PL_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-            data = df1, index = c("region", "period"),
-            model = "pooling"), type = c("bp")) # If p-value < 0.05 then random effects model is not
+#plmtest(plm(PL_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
+ #           data = df1, index = c("region", "period"),
+  #          model = "pooling"), type = c("bp")) # If p-value < 0.05 then random effects model is not
 # appropriate (compare to a simple OLS regression)
-
-model1 <- plm(PL_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"),
-              model = "pooling") # pooled OLS
-
-summary(plm(PL_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-            data = df1, index = c("region", "period"),
-            model = "within"))
-
-summary(model1)
+#model1 <- plm(PL_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
+ #             data = df1, index = c("region", "period"),
+  #            model = "pooling") # pooled OLS
 ## testing for unit roots/stationarity
 adf.test(df1$PL_ratio) # If p-value < 0.05 then no unit roots present
 ## testing for heteroskedasticity 
@@ -248,9 +237,7 @@ bptest(PL_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model1) # original coefficients
-coeftest(model1, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model1, vcovHC(model1, method = "arellano"))
-
+coeftest(model1, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
@@ -275,9 +262,7 @@ bptest(net_hierarchy ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_c
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model1) # original coefficients
-coeftest(model1, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model1, vcovHC(model1, method = "arellano")) 
-
+coeftest(model1, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
@@ -306,9 +291,7 @@ bptest(net_assortativity ~ treatment_int + gdp + dird + sub_region + sub_nat + s
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model1) # original coefficients
-coeftest(model1, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model1, vcovHC(model1, method = "arellano")) 
-
+coeftest(model1, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
@@ -337,8 +320,7 @@ bptest(share_local_nodes ~ treatment_int + gdp + dird + sub_region + sub_nat + s
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model1) # original coefficients
-coeftest(model1, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model1, vcovHC(model1, method = "arellano")) 
+coeftest(model1, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
@@ -364,8 +346,7 @@ bptest(share_regional_nodes ~ treatment_int + gdp + dird + sub_region + sub_nat 
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model1) # original coefficients
-coeftest(model1, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model1, vcovHC(model1, method = "arellano")) 
+coeftest(model1, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
@@ -395,8 +376,7 @@ bptest(share_national_nodes ~ treatment_int + gdp + dird + sub_region + sub_nat 
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model1) # original coefficients
-coeftest(model1, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model1, vcovHC(model1, method = "arellano")) 
+coeftest(model1, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
@@ -412,32 +392,27 @@ cor(df1[, 5:9])
 
 ### 1) Network embeddedness : density
 ## fixed / random effects regression: Hausman test
-phtest(plm(net_density ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+phtest(plm(net_density ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "within"),
-       plm(net_density ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
-           data = df1, index = c("region", "period"), model = "random")) # p-value > 0.05, then use random effects
+       plm(net_density ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+           data = df1, index = c("region", "period"), model = "random")) # p-value < 0.05, then use fixed effects
 ## estimating the random effects regression with plm()
-model2 <- plm(net_density ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "random")
+model2 <- plm(net_density ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within")
 summary(model2)
-## testing for random effects: Breusch-Pagan Lagrange multiplier (LM)
-plmtest(plm(net_density ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
-            data = df1, index = c("region", "period"),
-            model = "pooling"), type = c("bp")) # If p-value < 0.05 then random effects model is not
-# appropriate (compare to a simple OLS regression)
-model2 <- plm(net_density ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"),
-              model = "pooling") # pooled OLS
+## testing for time-fixed effects
+pFtest(plm(net_density ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee + period,
+           data = df1, index = c("region", "period"), model = "within"),
+       model2) # If p-value < 0.05 then use time-fixed effects
 summary(model2)
 ## testing for unit roots/stationarity
 adf.test(df1$net_density) # If p-value < 0.05 then no unit roots present
 ## testing for heteroskedasticity 
-bptest(net_density ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+bptest(net_density ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model2) # original coefficients
-coeftest(model2, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model2, vcovHC(model2, method = "arellano"))
+coeftest(model2, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
@@ -445,177 +420,159 @@ coeftest(model2, vcovHC(model2, method = "arellano"))
 
 ### 1) Network embeddedness : fragmentation index
 ## fixed / random effects regression: Hausman test
-phtest(plm(fragmentation_index ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+phtest(plm(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "within"),
-       plm(fragmentation_index ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
-           data = df1, index = c("region", "period"), model = "random")) # p-value < 0.05, then use fixed effects
+       plm(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+           data = df1, index = c("region", "period"), model = "random")) # p-value > 0.05, then use random effects
 ## estimating the random effects regression with plm()
-model2 <- plm(fragmentation_index ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within")
-summary(model2)
-## testing for time-fixed effects
-pFtest(plm(fragmentation_index ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee + period,
-           data = df1, index = c("region", "period"), model = "within"),
-       model2) # If p-value < 0.05 then use time-fixed effects
-## time fixed effects
-model2 <- plm(fragmentation_index ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+model2 <- plm(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "random")
 summary(model2)
 ## testing for unit roots/stationarity
 adf.test(df1$fragmentation_index) # If p-value < 0.05 then no unit roots present
 ## testing for heteroskedasticity 
-bptest(fragmentation_index ~ treatment_int * group, data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
+bptest(fragmentation_index ~ treatment_int : group, data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for random effects)
 coeftest(model2) # original coefficients
-coeftest(model2, vcov = vcovHC(model2, type = "HC1")) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model2, vcovHC(model2, method = "arellano")) 
+coeftest(model2, vcov = vcovHC(model2, type = "HC3")) # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
 
 ### 1) Network embeddedness : share of the network’s main component
 ## fixed / random effects regression: Hausman test
-phtest(plm(share_net_main_comp ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+phtest(plm(share_net_main_comp ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "within"),
-       plm(share_net_main_comp ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
-           data = df1, index = c("region", "period"), model = "random")) # p-value > 0.05, then use random effects
+       plm(share_net_main_comp ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+           data = df1, index = c("region", "period"), model = "random")) # p-value < 0.05, then use fixed effects
 ## estimating the fixed effects regression with plm()
-model2 <- plm(share_net_main_comp ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "random")
+model2 <- plm(share_net_main_comp ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within")
 summary(model2)
-## testing for random effects: Breusch-Pagan Lagrange multiplier (LM)
-plmtest(plm(share_net_main_comp ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
-            data = df1, index = c("region", "period"),
-            model = "pooling"), type = c("bp")) # If p-value < 0.05 then random effects model is not
-# appropriate (compare to a simple OLS regression)
-model2 <- plm(share_net_main_comp ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"),
-              model = "pooling") # pooled OLS
+## testing for time-fixed effects
+pFtest(plm(share_net_main_comp ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee + period,
+           data = df1, index = c("region", "period"), model = "within"),
+       model2) # If p-value < 0.05 then use time-fixed effects
 summary(model2)
 ## testing for unit roots/stationarity
 adf.test(df1$share_net_main_comp) # If p-value < 0.05 then no unit roots present
 ## testing for heteroskedasticity 
-bptest(share_net_main_comp ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+bptest(share_net_main_comp ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model2) # original coefficients
-coeftest(model2, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model2, vcovHC(model2, method = "arellano")) 
+coeftest(model2, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
 
 ### 2) Network efficiency : clustering coefficient (ratio)
 ## fixed / random effects regression: Hausman test
-phtest(plm(CC_ratio ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+phtest(plm(CC_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "within"),
-       plm(CC_ratio ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+       plm(CC_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "random")) # p-value < 0.05, then use fixed effects
 ## estimating the fixed effects regression with plm()
-model2 <- plm(CC_ratio ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+model2 <- plm(CC_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
               data = df1, index = c("region", "period"), model = "within")
 summary(model2)
 ## testing for time-fixed effects
-pFtest(plm(CC_ratio ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee + period,
+pFtest(plm(CC_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee + period,
            data = df1, index = c("region", "period"), model = "within"),
        model2) # If p-value < 0.05 then use time-fixed effects
 ## testing for unit roots/stationarity
 adf.test(df1$CC_ratio) # If p-value < 0.05 then no unit roots present
 ## testing for heteroskedasticity 
-bptest(CC_ratio ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+bptest(CC_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model2) # original coefficients
-coeftest(model2, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model2, vcovHC(model2, method = "arellano")) 
+coeftest(model2, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
 ### 2) Network efficiency : average path length (ratio)
 ## fixed / random effects regression: Hausman test
-phtest(plm(PL_ratio ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+phtest(plm(PL_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "within"),
-       plm(PL_ratio ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+       plm(PL_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "random")) # p-value < 0.05, then use fixed effects
 ## estimating the fixed effects regression with plm()
-model2 <- plm(PL_ratio ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+model2 <- plm(PL_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
               data = df1, index = c("region", "period"), model = "within")
 summary(model2)
 ## testing for time-fixed effects
-pFtest(plm(PL_ratio ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee + period,
+pFtest(plm(PL_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee + period,
            data = df1, index = c("region", "period"), model = "within"),
        model2) # If p-value < 0.05 then use time-fixed effects
 ## time fixed effects
-model2 <- plm(PL_ratio ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+model2 <- plm(PL_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
               data = df1, index = c("region", "period"), model = "within", effect = "twoways")
 summary(model2)
 ## testing for unit roots/stationarity
 adf.test(df1$PL_ratio) # If p-value < 0.05 then no unit roots present
 ## testing for heteroskedasticity 
-bptest(PL_ratio ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+bptest(PL_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model2) # original coefficients
-coeftest(model2, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model2, vcovHC(model2, method = "arellano")) 
+coeftest(model2, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
 
 ### 3) Network resilience : network hierarchy
 ## fixed / random effects regression: Hausman test
-phtest(plm(net_hierarchy ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+phtest(plm(net_hierarchy ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "within"),
-       plm(net_hierarchy ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+       plm(net_hierarchy ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "random")) # p-value < 0.05, then use fixed effects
 ## estimating the fixed effects regression with plm()
-model2 <- plm(net_hierarchy ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+model2 <- plm(net_hierarchy ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
               data = df1, index = c("region", "period"), model = "within")
 summary(model2)
 ## testing for time-fixed effects
-pFtest(plm(net_hierarchy ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee + period,
+pFtest(plm(net_hierarchy ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee + period,
            data = df1, index = c("region", "period"), model = "within"),
        model2) # If p-value < 0.05 then use time-fixed effects. Here, no need to use time-fixed effects
 ## testing for unit roots/stationarity
 adf.test(df1$net_hierarchy) # If p-value < 0.05 then no unit roots present
 ## testing for heteroskedasticity 
-bptest(net_hierarchy ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+bptest(net_hierarchy ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model2) # original coefficients
-coeftest(model2, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model2, vcovHC(model2, method = "arellano")) 
+coeftest(model2, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
 
 ### 3) Network resilience : network assortativity
 ## fixed / random effects regression: Hausman test
-phtest(plm(net_assortativity ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+phtest(plm(net_assortativity ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "within"),
-       plm(net_assortativity ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+       plm(net_assortativity ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "random")) # p-value < 0.05, then use fixed effects
 ## estimating the fixed effects regression with plm()
-model2 <- plm(net_assortativity ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+model2 <- plm(net_assortativity ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
               data = df1, index = c("region", "period"), model = "within")
 summary(model2)
 ## testing for time-fixed effects
-pFtest(plm(net_assortativity ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee + period,
+pFtest(plm(net_assortativity ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee + period,
            data = df1, index = c("region", "period"), model = "within"),
        model2) # If p-value < 0.05 then use time-fixed effects
 ## time fixed effects
-model2 <- plm(net_assortativity ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+model2 <- plm(net_assortativity ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
               data = df1, index = c("region", "period"), model = "within", effect = "twoways")
 summary(model2)
 ## testing for unit roots/stationarity
 adf.test(df1$net_assortativity) # If p-value < 0.05 then no unit roots present
 ## testing for heteroskedasticity 
-bptest(net_assortativity ~ treatment_int * group + gdp + dird + sub_region + sub_nat + sub_cee,
+bptest(net_assortativity ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model2) # original coefficients
-coeftest(model2, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model2, vcovHC(model2, method = "arellano")) 
+coeftest(model2, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
@@ -626,18 +583,17 @@ phtest(plm(share_local_nodes ~ treatment_int : group + gdp + dird + sub_region +
            data = df1, index = c("region", "period"), model = "within"),
        plm(share_local_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "random")) # p-value > 0.05, then use random effects
-## estimating the random effects regression with plm()
+## estimating the fixed effects regression with plm()
 model2 <- plm(share_local_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
               data = df1, index = c("region", "period"), model = "within")
 summary(model2)
-## testing for random effects: Breusch-Pagan Lagrange multiplier (LM)
-plmtest(plm(share_local_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-            data = df1, index = c("region", "period"),
-            model = "pooling"), type = c("bp")) # If p-value < 0.05 then random effects model is not
-# appropriate (compare to a simple OLS regression)
+## testing for time-fixed effects
+pFtest(plm(share_local_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee + period,
+           data = df1, index = c("region", "period"), model = "within"),
+       model2) # If p-value < 0.05 then use time-fixed effects
+## time fixed effects
 model2 <- plm(share_local_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"),
-              model = "pooling") # pooled OLS
+              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
 summary(model2)
 ## testing for unit roots/stationarity
 adf.test(df1$share_local_nodes) # If p-value < 0.05 then no unit roots present
@@ -646,8 +602,7 @@ bptest(share_local_nodes ~ treatment_int : group + gdp + dird + sub_region + sub
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model2) # original coefficients
-coeftest(model2, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model2, vcovHC(model2, method = "arellano")) 
+coeftest(model2, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
 
 
@@ -656,31 +611,24 @@ coeftest(model2, vcovHC(model2, method = "arellano"))
 phtest(plm(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "within"),
        plm(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-           data = df1, index = c("region", "period"), model = "random")) # p-value > 0.05, then use random effects
-## estimating the random effects regression with plm()
+           data = df1, index = c("region", "period"), model = "random")) # p-value > 0.05, then use fixed effects
+## estimating the fixed effects regression with plm()
 model2 <- plm(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
               data = df1, index = c("region", "period"), model = "within")
 summary(model2)
-## testing for random effects: Breusch-Pagan Lagrange multiplier (LM)
-plmtest(plm(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-            data = df1, index = c("region", "period"),
-            model = "pooling"), type = c("bp")) # If p-value < 0.05 then random effects model is not
-# appropriate (compare to a simple OLS regression)
-model2 <- plm(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"),
-              model = "pooling") # pooled OLS
-summary(model2)
+## testing for time-fixed effects
+pFtest(plm(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee + period,
+           data = df1, index = c("region", "period"), model = "within"),
+       model2) # If p-value < 0.05 then use time-fixed effects
+## testing for unit roots/stationarity
+adf.test(df1$share_regional_nodes) # If p-value < 0.05 then no unit roots present
 ## testing for heteroskedasticity 
 bptest(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model2) # original coefficients
-coeftest(model2, vcov. = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model2, vcovHC(model2, method = "arellano")) 
+coeftest(model2, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 # assessing multicollinearity 
-car::vif(plm(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-             data = df1, index = c("region", "period"),
-             model = "pooling"))
 
 
 
@@ -690,18 +638,10 @@ car::vif(plm(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_reg
 phtest(plm(share_national_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
            data = df1, index = c("region", "period"), model = "within"),
        plm(share_national_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-           data = df1, index = c("region", "period"), model = "random")) # p-value < 0.05, then use fixed effects
-## estimating the fixed effects regression with plm()
+           data = df1, index = c("region", "period"), model = "random")) # p-value > 0.05, then use random effects
+## estimating the random effects regression with plm()
 model2 <- plm(share_national_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
               data = df1, index = c("region", "period"), model = "random")
-summary(model2)
-## testing for time-fixed effects
-pFtest(plm(share_national_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee + period,
-           data = df1, index = c("region", "period"), model = "within"),
-       model2) # If p-value < 0.05 then use time-fixed effects
-## time fixed effects
-model2 <- plm(share_national_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
 summary(model2)
 ## testing for unit roots/stationarity
 adf.test(df1$share_national_nodes) # If p-value < 0.05 then no unit roots present
@@ -710,13 +650,8 @@ bptest(share_national_nodes ~ treatment_int : group + gdp + dird + sub_region + 
        data = df1, studentize = FALSE) # if p-value < 0.05, presence of heteroskedasticity 
 # correction (for fixed effects)
 coeftest(model2) # original coefficients
-coeftest(model2, vcov = vcovHC) # robust standard errors (heteroskedasticity consistent coefficients)
-coeftest(model2, vcovHC(model2, method = "arellano")) 
+coeftest(model2, vcov = vcovHC, type = "HC3") # robust standard errors (heteroskedasticity consistent coefficients)
 
-
-
-cor(df1[, 5:9])
-glimpse(df1)
 
 
 
