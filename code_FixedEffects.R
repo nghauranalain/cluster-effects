@@ -95,6 +95,13 @@ library(tseries)
 library(lmtest)
 
 
+########################################################################## TEST
+model0 <- plm(log(nb_patents) ~ gdp + dird + sub_region + sub_nat + sub_cee +
+                      net_density + fragmentation_index + share_net_main_comp +
+                      CC_actual + PL_actual + share_local_nodes + share_regional_nodes,
+              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+summary(model0)
+coeftest(model0, vcov = vcovHC, type = "HC1")
 
 ################################################################################
 ################################################################## Estimations 1 
@@ -132,6 +139,8 @@ model1 <- plm(PL_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub
               data = df1, index = c("region", "period"), model = "within", effect = "twoways")
 summary(model1)
 coeftest(model1, vcov = vcovHC, type = "HC1")
+
+################################################################################
 
 ### 3) Network resilience : network hierarchy
 model1 <- plm(net_hierarchy ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
@@ -236,7 +245,7 @@ coeftest(model2, vcov = vcovHC, type = "HC1")
 model2 <- plm(share_national_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
               data = df1, index = c("region", "period"), model = "within", effect = "twoways")
 summary(model2)
-coeftest(model2, vcov = vcovHC, type = "HC3")
+coeftest(model2, vcov = vcovHC, type = "HC1")
 
 
 
@@ -251,22 +260,58 @@ data("usaww")
 
 
 glimpse(df1)
+df2 <- select(df1, -net_name, -region)
+glimpse(df2)
 
 sp.mat <- read.table("../spatial_matrix.txt")
 row.names(sp.mat)
 colnames(sp.mat) <- substr(colnames(sp.mat), 2, 3)
 sp.mat <- as.matrix(sp.mat)
+rowSums(sp.mat)
 sp.matl <- mat2listw(sp.mat)
 
-str(df1)
 
-spml(formula = share_national_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-     data = df1, index = c("dep", "period"),
-     listw = sp.matl, lag = TRUE, spatial.error = "b", model = "within",
-     effect = "twoways", method = "eigen", na.action = na.fail,
-     quiet = TRUE)
+## tests
+# RLMlag robust version
+slmtest(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region +
+                sub_nat + sub_cee,
+        data = df2, listw = sp.matl, model = "within", effect = "twoways",
+        test = "rlml")
+# RLMerr robust version
+slmtest(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region +
+                sub_nat + sub_cee,
+        data = df2, listw = sp.matl, model = "within", effect = "twoways",
+        test = "rlme")
+## choose the most significative test
+
+## models
+# SAR (for network spatial matrix)
+summary(
+        spml(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region +
+                     sub_nat + sub_cee,
+             data = df2, index = c("dep", "period"), model = "within", effect = "twoways",
+             lag = TRUE, listw = sp.matl, error = "none")
+)
+
+# SEM (for geo spatial matrix)
+summary(
+        spml(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region +
+                     sub_nat + sub_cee,
+             data = df2, index = c("dep", "period"), model = "within", effect = "twoways",
+             lag = FALSE, listw = sp.matl, error = "b")
+)
 
 
+
+## moments
+
+summary(
+        spgm(net_density ~ treatment_int : group + gdp + dird + sub_region +
+                     sub_nat + sub_cee,
+             data = df2, index = c("dep", "period"), model = "within",
+             listw = sp.matl, moments = "initial", lag = TRUE,
+             spatial.error = FALSE)
+)
 
 
 
