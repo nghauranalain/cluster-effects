@@ -303,12 +303,43 @@ summary(
 
 
 
+# SDM (for geo spatial matrix)
+glimpse(df2)
+df3 <- pdata.frame(df2, index = c("dep", "period"))
+df3$treatment_int_SL <- slag(df3$treatment_int, sp.matl)
+df3$gdp_SL <- slag(df3$gdp, sp.matl)
+df3$dird_SL <- slag(df3$dird, sp.matl)
+df3$sub_region_SL <- slag(df3$sub_region, sp.matl)
+df3$sub_nat_SL <- slag(df3$sub_nat, sp.matl)
+df3$sub_cee_SL <- slag(df3$sub_cee, sp.matl)
+glimpse(df3)
+
+
+summary(
+        model3 <- spml(share_national_nodes ~ treatment_int + gdp + dird + sub_region +
+                               sub_nat + sub_cee +
+                               treatment_int_SL + gdp_SL + dird_SL + sub_region_SL +
+                               sub_nat_SL + sub_cee_SL,
+                       data = df3, index = c("dep", "period"), model = "within",
+                       effect = "twoways", lag = TRUE, listw = sp.matl, error = "none")
+)
+
+## calculate impact measures
+effects.splm(model3)
+
+res <- impacts(model3, listw = sp.matl)
+summary(impac1, zstats=TRUE, short=TRUE)
+# }
+
+
 ## moments
 
 summary(
-        spgm(net_density ~ treatment_int : group + gdp + dird + sub_region +
-                     sub_nat + sub_cee,
-             data = df2, index = c("dep", "period"), model = "within",
+        model3 <- spgm(net_density ~ treatment_int + gdp + dird + sub_region +
+                               sub_nat + sub_cee +
+                               treatment_int_SL + gdp_SL + dird_SL + sub_region_SL +
+                               sub_nat_SL + sub_cee_SL,
+             data = df3, index = c("dep", "period"), model = "within",
              listw = sp.matl, moments = "initial", lag = TRUE,
              spatial.error = FALSE)
 )
