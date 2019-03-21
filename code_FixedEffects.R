@@ -255,20 +255,22 @@ coeftest(model2, vcov = vcovHC, type = "HC1")
 library(splm)
 library(spdep)
 
-data("Produc", package = "Ecdat")
-data("usaww")
+#data("Produc", package = "Ecdat")
+#data("usaww")
 
 
 glimpse(df1)
 df2 <- select(df1, -net_name, -region)
 glimpse(df2)
 
-sp.mat <- read.table("../spatial_matrix.txt")
+#sp.mat <- read.table("../spatial_matrix.txt")
+sp.mat <- read.table("../net_matrix2.txt")
+
 row.names(sp.mat)
 colnames(sp.mat) <- substr(colnames(sp.mat), 2, 3)
 sp.mat <- as.matrix(sp.mat)
 rowSums(sp.mat)
-sp.matl <- mat2listw(sp.mat)
+sp.matl <- mat2listw(sp.mat, style = "W")
 
 
 ## tests
@@ -316,8 +318,8 @@ glimpse(df3)
 
 
 summary(
-        model3 <- spml(share_national_nodes ~ treatment_int + gdp + dird + sub_region +
-                               sub_nat + sub_cee +
+        model3 <- spml(share_net_main_comp ~ treatment_int : group + gdp + dird + sub_region +
+                               sub_nat + sub_cee + 
                                treatment_int_SL + gdp_SL + dird_SL + sub_region_SL +
                                sub_nat_SL + sub_cee_SL,
                        data = df3, index = c("dep", "period"), model = "within",
@@ -325,24 +327,28 @@ summary(
 )
 
 ## calculate impact measures
-effects.splm(model3)
+time <- length(unique(df3$period))
+set.seed(1234)
+imps <- impacts(model3, listw = sp.matl, time = time)
+summary(imps, zstats = TRUE, short = TRUE)
 
-res <- impacts(model3, listw = sp.matl)
-summary(impac1, zstats=TRUE, short=TRUE)
-# }
 
 
 ## moments
 
 summary(
-        model3 <- spgm(net_density ~ treatment_int + gdp + dird + sub_region +
+        model4 <- spgm(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_region +
                                sub_nat + sub_cee +
                                treatment_int_SL + gdp_SL + dird_SL + sub_region_SL +
                                sub_nat_SL + sub_cee_SL,
              data = df3, index = c("dep", "period"), model = "within",
-             listw = sp.matl, moments = "initial", lag = TRUE,
+             listw = sp.matl, moments = "fullweights", lag = TRUE,
              spatial.error = FALSE)
 )
+
+effects(model4)
+
+# https://cran.r-project.org/web/packages/export/export.pdf
 
 
 
