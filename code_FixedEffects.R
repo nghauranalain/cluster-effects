@@ -263,8 +263,8 @@ glimpse(df1)
 df2 <- select(df1, -net_name, -region)
 glimpse(df2)
 
-#sp.mat <- read.table("../spatial_matrix.txt")
-sp.mat <- read.table("../net_matrix2.txt")
+sp.mat <- read.table("../spatial_matrix.txt")
+#sp.mat <- read.table("../net_matrix2.txt")
 
 row.names(sp.mat)
 colnames(sp.mat) <- substr(colnames(sp.mat), 2, 3)
@@ -315,35 +315,48 @@ df3$sub_region_SL <- slag(df3$sub_region, sp.matl)
 df3$sub_nat_SL <- slag(df3$sub_nat, sp.matl)
 df3$sub_cee_SL <- slag(df3$sub_cee, sp.matl)
 glimpse(df3)
+colnames(df3)
 
-
+## SDEM
 summary(
-        model3 <- spml(share_net_main_comp ~ treatment_int : group + gdp + dird + sub_region +
+        model3 <- spml(share_national_nodes ~ treatment_int : group + gdp + dird + sub_region +
+                               sub_nat + sub_cee + 
+                               treatment_int_SL + gdp_SL + dird_SL + sub_region_SL +
+                               sub_nat_SL + sub_cee_SL,
+                       data = df3, index = c("dep", "period"), model = "within",
+                       effect = "twoways", lag = FALSE, listw = sp.matl, error = "b")
+)
+
+
+## SDM
+summary(
+        model3 <- spml(net_density ~ treatment_int : group + gdp + dird + sub_region +
                                sub_nat + sub_cee + 
                                treatment_int_SL + gdp_SL + dird_SL + sub_region_SL +
                                sub_nat_SL + sub_cee_SL,
                        data = df3, index = c("dep", "period"), model = "within",
                        effect = "twoways", lag = TRUE, listw = sp.matl, error = "none")
 )
+#,LeeYu = TRUE, Hess = FALSE
 
 ## calculate impact measures
 time <- length(unique(df3$period))
 set.seed(1234)
 imps <- impacts(model3, listw = sp.matl, time = time)
 summary(imps, zstats = TRUE, short = TRUE)
-
-
+## fixed effects
+effects(model3)
 
 ## moments
 
 summary(
-        model4 <- spgm(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_region +
+        model4 <- spgm(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region +
                                sub_nat + sub_cee +
                                treatment_int_SL + gdp_SL + dird_SL + sub_region_SL +
                                sub_nat_SL + sub_cee_SL,
              data = df3, index = c("dep", "period"), model = "within",
-             listw = sp.matl, moments = "fullweights", lag = TRUE,
-             spatial.error = FALSE)
+             listw = sp.matl, moments = "fullweights", lag = FALSE,
+             spatial.error = TRUE)
 )
 
 effects(model4)
