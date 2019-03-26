@@ -192,6 +192,7 @@ model2 <- plm(fragmentation_index ~ treatment_int : group + gdp + dird + sub_reg
               data = df1, index = c("region", "period"), model = "within", effect = "twoways")
 summary(model2)
 coeftest(model2, vcov = vcovHC, type = "HC1")
+coeftest(model2, vcov = vcovHC(model2, type = "HC1", cluster = "group"))
 
 ### 1) Network embeddedness : share of the network’s main component
 model2 <- plm(share_net_main_comp ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
@@ -305,6 +306,38 @@ summary(
 
 
 
+AICsplm = function(object, k=2, criterion=c("AIC", "BIC")){
+        sp = summary(object)
+        l = sp$logLik
+        np = length(coef(sp))
+        N = nrow(sp$model)
+        if (sp$effects=="sptpfe") {
+                n = length(sp$res.eff[[1]]$res.sfe)
+                T = length(sp$res.eff[[1]]$res.tfe)
+                np = np+n+T
+        }
+        if (sp$effects=="spfe") {
+                n = length(sp$res.eff[[1]]$res.sfe)
+                np = np+n+1
+        }
+        if (sp$effects=="tpfe") {
+                T = length(sp$res.eff[[1]]$res.tfe)
+                np = np+T+1
+        }
+        if(criterion=="AIC"){
+                aic = -2*l+k*np
+                names(aic) = "AIC"
+                return(aic)
+        }
+        if(criterion=="BIC"){
+                bic = -2*l+log(N)*np
+                names(bic) = "BIC"
+                return(bic)
+        }
+}
+
+
+
 # SDM (for geo spatial matrix)
 glimpse(df2)
 df3 <- pdata.frame(df2, index = c("dep", "period"))
@@ -317,33 +350,73 @@ df3$sub_cee_SL <- slag(df3$sub_cee, sp.matl)
 glimpse(df3)
 colnames(df3)
 
-## SDEM
+# (SDEM)
 summary(
-        model3 <- spml(share_national_nodes ~ treatment_int : group + gdp + dird + sub_region +
-                               sub_nat + sub_cee + 
-                               treatment_int_SL + gdp_SL + dird_SL + sub_region_SL +
-                               sub_nat_SL + sub_cee_SL,
+        model3.SDEM <- spml(net_density ~ treatment_int : group + gdp + dird +
+                                    sub_region + sub_nat + sub_cee + treatment_int_SL +
+                                    gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + 
+                                    sub_cee_SL,
                        data = df3, index = c("dep", "period"), model = "within",
-                       effect = "twoways", lag = FALSE, listw = sp.matl, error = "b")
-)
+                       effect = "twoways", lag = FALSE, listw = sp.matl, error = "b",
+                       LeeYu = TRUE, Hess = FALSE)
+        )
+summary(model3.SDEM)$rsqr
 
 
-## SDM
+
+# SDM
 summary(
-        model3 <- spml(net_density ~ treatment_int : group + gdp + dird + sub_region +
-                               sub_nat + sub_cee + 
-                               treatment_int_SL + gdp_SL + dird_SL + sub_region_SL +
-                               sub_nat_SL + sub_cee_SL,
-                       data = df3, index = c("dep", "period"), model = "within",
-                       effect = "twoways", lag = TRUE, listw = sp.matl, error = "none")
+        model3.SDM <- spml(net_density ~ treatment_int : group + gdp + dird +
+                                   sub_region + sub_nat + sub_cee + treatment_int_SL +
+                                   gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + 
+                                   sub_cee_SL, data = df3, index = c("dep", "period"),
+                           model = "within", effect = "twoways", lag = TRUE,
+                           listw = sp.matl, error = "none", quiet = FALSE,
+                           LeeYu = TRUE, Hess = FALSE)
+        )
+(4*94)-(16)-94-4+1
+s2.model3.SDM <- sum(model3.SDM$resid^2)/263
+s2.model3.SDM
+s.model3.SDM = sqrt(s2.model3.SDM)
+s.model3.SDM
+R2.model3.SDM = 1 - var(model3.SDM$resid) / var(df3$net_density)
+R2.model3.SDM
+#or
+summary(model3.SDM)$rsqr
+summary(model3.SDM)$effects
+
+AICsplm(model3.SDM, criterion = "BIC")
+
+
+
+
+
+# SLX
+summary(
+        model3.SLX <- plm(net_density ~ treatment_int : group + gdp + dird + 
+                                  sub_region + sub_nat + sub_cee + treatment_int_SL +
+                                  gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + sub_cee_SL,
+                          data = df3, index = c("dep", "period"), model = "within",
+                          effect = "twoways")
+        )
+
+# SAR
+summary(
+        model3.SAR <- spml(net_density ~ treatment_int : group + gdp + dird +
+                                   sub_region + sub_nat + sub_cee,
+                           data = df3, index = c("dep", "period"),
+                           model = "within", effect = "twoways", lag = TRUE,
+                           listw = sp.matl, error = "none", LeeYu = TRUE, Hess = FALSE)
 )
-#,LeeYu = TRUE, Hess = FALSE
+
+coeftest(model3)
 
 ## calculate impact measures
 time <- length(unique(df3$period))
 set.seed(1234)
 imps <- impacts(model3, listw = sp.matl, time = time)
 summary(imps, zstats = TRUE, short = TRUE)
+
 ## fixed effects
 effects(model3)
 
