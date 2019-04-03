@@ -305,7 +305,7 @@ summary(
 )
 
 
-
+# function from Spatial_Econometrics_with_R (Prof. Dr. Reinhold Kosfeld)
 AICsplm = function(object, k=2, criterion=c("AIC", "BIC")){
         sp = summary(object)
         l = sp$logLik
@@ -337,6 +337,58 @@ AICsplm = function(object, k=2, criterion=c("AIC", "BIC")){
 }
 
 
+# function from https://stackoverflow.com/questions/46186527/how-to-calculate-bic-and-aic-for-a-gmm-model-in-r-using-plm
+AICplm <- function(object, criterion) {
+        # object is "plm", "panelmodel" 
+        # Lets panel data has index :index = c("dep", "period")
+        
+        sp = summary(object)
+        
+        if(class(object)[1]=="plm"){
+                u.hat <- residuals(sp) # extract residuals
+                df <- cbind(as.vector(u.hat), attr(u.hat, "index"))
+                names(df) <- c("resid", "dep", "period")
+                c = length(levels(df$dep)) # extract country dimension 
+                t = length(levels(df$period)) # extract time dimension 
+                np = length(sp$coefficients[,1]) # number of parameters
+                n.N = nrow(sp$model) # number of data
+                s.sq  <- log( (sum(u.hat^2)/(n.N))) # log sum of squares
+                
+                # effect = c("individual", "time", "twoways", "nested"),
+                # model = c("within", "random", "ht", "between", "pooling", "fd")
+                
+                # I am making example only with some of the versions:
+                
+                if (sp$args$model == "within" & sp$args$effect == "individual"){
+                        n = c
+                        np = np+n+1 # update number of parameters
+                }
+                
+                if (sp$args$model == "within" & sp$args$effect == "time"){
+                        T = t
+                        np = np+T+1 # update number of parameters
+                }
+                
+                if (sp$args$model == "within" & sp$args$effect == "twoways"){
+                        n = c
+                        T = t
+                        np = np+n+T # update number of parameters
+                }
+                aic <- round(2*np  +  n.N * (log(2*pi) + s.sq  + 1 ),1)
+                bic <- round(log(n.N)*np  +  n.N * (log(2*pi) + s.sq  + 1 ), 1)
+                
+                if(criterion=="AIC"){
+                        names(aic) = "AIC"
+                        return(aic)
+                }
+                if(criterion=="BIC"){
+                        names(bic) = "BIC"
+                        return(bic)
+                }
+        }
+}
+
+
 
 # SDM (for geo spatial matrix)
 glimpse(df2)
@@ -350,55 +402,76 @@ df3$sub_cee_SL <- slag(df3$sub_cee, sp.matl)
 glimpse(df3)
 colnames(df3)
 
-# (SDEM)
+# SDEM
 summary(
         model3.SDEM <- spml(net_density ~ treatment_int : group + gdp + dird +
-                                    sub_region + sub_nat + sub_cee + treatment_int_SL +
+                                    sub_region + sub_nat + sub_cee + treatment_int_SL : group +
                                     gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + 
                                     sub_cee_SL,
                        data = df3, index = c("dep", "period"), model = "within",
-                       effect = "twoways", lag = FALSE, listw = sp.matl, error = "b",
+                       effect = "twoways", lag = FALSE, listw = sp.matl, spatial.error = "b",
                        LeeYu = TRUE, Hess = FALSE)
         )
 summary(model3.SDEM)$rsqr
 
 
-
 # SDM
 summary(
         model3.SDM <- spml(net_density ~ treatment_int : group + gdp + dird +
-                                   sub_region + sub_nat + sub_cee + treatment_int_SL +
+                                   sub_region + sub_nat + sub_cee + treatment_int_SL : group +
                                    gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + 
                                    sub_cee_SL, data = df3, index = c("dep", "period"),
                            model = "within", effect = "twoways", lag = TRUE,
-                           listw = sp.matl, error = "none", quiet = FALSE,
-                           LeeYu = TRUE, Hess = FALSE)
+                           listw = sp.matl, spatial.error = "none", LeeYu = TRUE, Hess = FALSE)
         )
-(4*94)-(16)-94-4+1
-s2.model3.SDM <- sum(model3.SDM$resid^2)/263
-s2.model3.SDM
-s.model3.SDM = sqrt(s2.model3.SDM)
-s.model3.SDM
-R2.model3.SDM = 1 - var(model3.SDM$resid) / var(df3$net_density)
-R2.model3.SDM
-#or
 summary(model3.SDM)$rsqr
-summary(model3.SDM)$effects
 
-AICsplm(model3.SDM, criterion = "BIC")
+## calculate impact measures
+time <- length(unique(df3$period))
+set.seed(1234)
+imps <- impacts(model3.SDM, listw = sp.matl, time = time)
+summary(imps, zstats = TRUE, short = TRUE)
 
 
 
+###################################################### EXAMPLE
+# send an email to Giovanni Millo <giovanni.millo@generali.com>
+
+data(Produc, package = "plm")
+data(usaww)
+# create W.X variables using slag()
+Produc2 <- pdata.frame(Produc, index = c("state", "year"))
+Produc2$pcap_SL <- slag(log(Produc2$pcap), mat2listw(usaww))
+Produc2$pc_SL <- slag(log(Produc2$pc), mat2listw(usaww))
+Produc2$emp_SL <- slag(log(Produc2$emp), mat2listw(usaww))
+Produc2$unemp_SL <- slag(log(Produc2$unemp), mat2listw(usaww))
+
+fm <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp + 
+                 pcap_SL + pc_SL + emp_SL + unemp_SL
+# SDM        
+summary(
+        respatlag <- spml(fm, data = Produc2, index = c("dep", "period"),
+                          model = "within", effect = "twoways", lag = TRUE,
+                          listw = mat2listw(usaww), spatial.error = "none",
+                          LeeYu = TRUE, Hess = FALSE)
+        )
+## calculate impact measures
+impac1 <- impacts(respatlag, listw = mat2listw(usaww, style = "W"), time = 17)
+summary(impac1, zstats = TRUE, short = TRUE)
+
+###################################################### EXAMPLE
 
 
+#### Seline's suggestion
 # SLX
 summary(
         model3.SLX <- plm(net_density ~ treatment_int : group + gdp + dird + 
-                                  sub_region + sub_nat + sub_cee + treatment_int_SL +
+                                  sub_region + sub_nat + sub_cee + treatment_int_SL : group +
                                   gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + sub_cee_SL,
-                          data = df3, index = c("dep", "period"), model = "within",
-                          effect = "twoways")
+                          quiet = FALSE, data = df3, index = c("dep", "period"),
+                          model = "within", effect = "twoways")
         )
+
 
 # SAR
 summary(
@@ -406,33 +479,42 @@ summary(
                                    sub_region + sub_nat + sub_cee,
                            data = df3, index = c("dep", "period"),
                            model = "within", effect = "twoways", lag = TRUE,
-                           listw = sp.matl, error = "none", LeeYu = TRUE, Hess = FALSE)
+                           listw = sp.matl, spatial.error = "none",
+                           LeeYu = TRUE, Hess = FALSE)
 )
+summary(model3.SAR)$rsqr
+model3.SAR$logLik
 
-coeftest(model3)
 
-## calculate impact measures
-time <- length(unique(df3$period))
-set.seed(1234)
-imps <- impacts(model3, listw = sp.matl, time = time)
-summary(imps, zstats = TRUE, short = TRUE)
 
-## fixed effects
-effects(model3)
+### Models comparison: SDM vs SAR and SDM vs SLX
+## SDM vs SAR 
+AICsplm(model3.SDM, criterion = "AIC")
+AICsplm(model3.SAR, criterion = "AIC")
+AICsplm(model3.SDM, criterion = "BIC")
+AICsplm(model3.SAR, criterion = "BIC")
+# SDM wins SAR
 
-## moments
+## SDM vs SLX 
+AICsplm(model3.SDM, criterion = "AIC")
+AICplm(model3.SLX, criterion = "AIC")
+AICsplm(model3.SDM, criterion = "BIC")
+AICplm(model3.SLX, criterion = "BIC")
+#
 
+
+
+## SDM (GM estimation)
 summary(
-        model4 <- spgm(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region +
+        model4 <- spgm(net_density ~ treatment_int : group + gdp + dird + sub_region +
                                sub_nat + sub_cee +
-                               treatment_int_SL + gdp_SL + dird_SL + sub_region_SL +
+                               treatment_int_SL : group + gdp_SL + dird_SL + sub_region_SL +
                                sub_nat_SL + sub_cee_SL,
              data = df3, index = c("dep", "period"), model = "within",
-             listw = sp.matl, moments = "fullweights", lag = FALSE,
-             spatial.error = TRUE)
+             listw = sp.matl, moments = "fullweights", lag = TRUE,
+             spatial.error = FALSE)
 )
-
-effects(model4)
+summary(model4)$rsqr
 
 # https://cran.r-project.org/web/packages/export/export.pdf
 
