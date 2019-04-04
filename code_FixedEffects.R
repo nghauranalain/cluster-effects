@@ -50,6 +50,8 @@ grps <- select(grps, dep, groupe)
 grps$dep <- ifelse(nchar(grps$dep) == 1, paste0("0", grps$dep), grps$dep)
 controls <- controls %>% left_join(grps, by = "dep")
 colnames(controls)[10] <- "group"
+# save grps for plot
+write.csv(grps, "./carto/grps.csv")
 rm(deps, grps)
 
 
@@ -102,6 +104,9 @@ model0 <- plm(log(nb_patents) ~ gdp + dird + sub_region + sub_nat + sub_cee +
               data = df1, index = c("region", "period"), model = "within", effect = "twoways")
 summary(model0)
 coeftest(model0, vcov = vcovHC, type = "HC1")
+
+
+
 
 ################################################################################
 ################################################################## Estimations 1 
@@ -404,7 +409,7 @@ colnames(df3)
 
 # SDEM
 summary(
-        model3.SDEM <- spml(net_density ~ treatment_int : group + gdp + dird +
+        model3.SDEM <- spml(net_hierarchy ~ treatment_int : group + gdp + dird +
                                     sub_region + sub_nat + sub_cee + treatment_int_SL : group +
                                     gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + 
                                     sub_cee_SL,
@@ -417,7 +422,7 @@ summary(model3.SDEM)$rsqr
 
 # SDM
 summary(
-        model3.SDM <- spml(net_density ~ treatment_int : group + gdp + dird +
+        model3.SDM <- spml(PL_ratio ~ treatment_int : group + gdp + dird +
                                    sub_region + sub_nat + sub_cee + treatment_int_SL : group +
                                    gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + 
                                    sub_cee_SL, data = df3, index = c("dep", "period"),
@@ -431,35 +436,6 @@ time <- length(unique(df3$period))
 set.seed(1234)
 imps <- impacts(model3.SDM, listw = sp.matl, time = time)
 summary(imps, zstats = TRUE, short = TRUE)
-
-
-
-###################################################### EXAMPLE
-# send an email to Giovanni Millo <giovanni.millo@generali.com>
-
-data(Produc, package = "plm")
-data(usaww)
-# create W.X variables using slag()
-Produc2 <- pdata.frame(Produc, index = c("state", "year"))
-Produc2$pcap_SL <- slag(log(Produc2$pcap), mat2listw(usaww))
-Produc2$pc_SL <- slag(log(Produc2$pc), mat2listw(usaww))
-Produc2$emp_SL <- slag(log(Produc2$emp), mat2listw(usaww))
-Produc2$unemp_SL <- slag(log(Produc2$unemp), mat2listw(usaww))
-
-fm <- log(gsp) ~ log(pcap) + log(pc) + log(emp) + unemp + 
-                 pcap_SL + pc_SL + emp_SL + unemp_SL
-# SDM        
-summary(
-        respatlag <- spml(fm, data = Produc2, index = c("dep", "period"),
-                          model = "within", effect = "twoways", lag = TRUE,
-                          listw = mat2listw(usaww), spatial.error = "none",
-                          LeeYu = TRUE, Hess = FALSE)
-        )
-## calculate impact measures
-impac1 <- impacts(respatlag, listw = mat2listw(usaww, style = "W"), time = 17)
-summary(impac1, zstats = TRUE, short = TRUE)
-
-###################################################### EXAMPLE
 
 
 #### Seline's suggestion
