@@ -6,6 +6,8 @@ rm(list = ls())
 getwd()
 options(digits = 5)
 
+#install.packages("")
+
 #### packages
 library(tidyverse)
 library(data.table)
@@ -95,6 +97,7 @@ library(plm)
 library(AER)
 library(tseries)
 library(lmtest)
+
 
 
 ########################################################################## TEST
@@ -261,6 +264,7 @@ coeftest(model2, vcov = vcovHC, type = "HC1")
 library(splm)
 library(spdep)
 
+
 #data("Produc", package = "Ecdat")
 #data("usaww")
 
@@ -422,7 +426,7 @@ summary(model3.SDEM)$rsqr
 
 # SDM
 summary(
-        model3.SDM <- spml(PL_ratio ~ treatment_int : group + gdp + dird +
+        model3.SDM <- spml(net_density ~ treatment_int : group + gdp + dird +
                                    sub_region + sub_nat + sub_cee + treatment_int_SL : group +
                                    gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + 
                                    sub_cee_SL, data = df3, index = c("dep", "period"),
@@ -431,12 +435,43 @@ summary(
         )
 summary(model3.SDM)$rsqr
 
+
+
 ## calculate impact measures
 time <- length(unique(df3$period))
 set.seed(1234)
 imps <- impacts(model3.SDM, listw = sp.matl, time = time)
 summary(imps, zstats = TRUE, short = TRUE)
 
+# test
+model3.SDM$spat.coef
+iIrW  <- invIrW(sp.matl, model3.SDM$spat.coef)
+model3.SDM$coefficients
+model3.SDM$coefficients[2]
+model3.SDM$coefficients[7]
+
+S_gdp <- iIrW %*% ((model3.SDM$coefficients[2] * diag(94)) - # diag(nrow(df3))
+                           (model3.SDM$coefficients[7] * listw2mat(sp.matl)))
+
+S_gdp <- iIrW %*% (model3.SDM$coefficients[2] * diag(94)) # gives wrong impact got from impacts()
+
+# Then you can get the direct and total impacts in the usual way: 
+dir_gdp <- sum(diag(S_gdp))/94 # mean
+tot_gdp <- sum(c(S_gdp))/94
+indir_gdp <- tot_gdp - dir_gdp
+
+mean(diag(S_gdp))
+summary(diag(S_gdp))
+sd(diag(S_gdp))
+LaplacesDemon::p.interval(diag(S_gdp), prob = 0.95)
+LaplacesDemon::p.interval(c(S_gdp), prob = 0.95)
+
+impacts
+methods(impacts)
+getS3method("impacts", "sarlm") 
+
+
+#
 
 #### Seline's suggestion
 # SLX
@@ -458,9 +493,10 @@ summary(
                            listw = sp.matl, spatial.error = "none",
                            LeeYu = TRUE, Hess = FALSE)
 )
+model3.SAR$type
+
 summary(model3.SAR)$rsqr
 model3.SAR$logLik
-
 
 
 ### Models comparison: SDM vs SAR and SDM vs SLX
@@ -493,14 +529,5 @@ summary(
 summary(model4)$rsqr
 
 # https://cran.r-project.org/web/packages/export/export.pdf
-
-
-
-
-
-
-
-
-
 
 
