@@ -426,7 +426,7 @@ summary(model3.SDEM)$rsqr
 
 # SDM
 summary(
-        model3.SDM <- spml(net_density ~ treatment_int : group + gdp + dird +
+        model3.SDM <- spml(net_assortativity ~ treatment_int : group + gdp + dird +
                                    sub_region + sub_nat + sub_cee + treatment_int_SL : group +
                                    gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + 
                                    sub_cee_SL, data = df3, index = c("dep", "period"),
@@ -436,11 +436,11 @@ summary(
 summary(model3.SDM)$rsqr
 
 
-
 ## calculate impact measures
 time <- length(unique(df3$period))
 set.seed(1234)
 imps <- impacts(model3.SDM, listw = sp.matl, time = time)
+impacts(model3.SDM)
 summary(imps, zstats = TRUE, short = TRUE)
 
 # test
@@ -453,23 +453,36 @@ model3.SDM$coefficients[7]
 S_gdp <- iIrW %*% ((model3.SDM$coefficients[2] * diag(94)) - # diag(nrow(df3))
                            (model3.SDM$coefficients[7] * listw2mat(sp.matl)))
 
-S_gdp <- iIrW %*% (model3.SDM$coefficients[2] * diag(94)) # gives wrong impact got from impacts()
+#S_gdp <- iIrW %*% (model3.SDM$coefficients[2] * diag(94)) # gives wrong impact got from impacts()
 
 # Then you can get the direct and total impacts in the usual way: 
-dir_gdp <- sum(diag(S_gdp))/94 # mean
-tot_gdp <- sum(c(S_gdp))/94
-indir_gdp <- tot_gdp - dir_gdp
+dir_gdp <-  mean(diag(S_gdp)) # or sum(diag(S_gdp))/94
+tot_gdp <- mean(rowSums(S_gdp)) # or sum(S_gdp)/94
+indir_gdp <- sum(S_gdp[lower.tri(S_gdp) | upper.tri(S_gdp)]) / 94 # or tot_gdp - dir_gdp 
 
-mean(diag(S_gdp))
-summary(diag(S_gdp))
+
 sd(diag(S_gdp))
 LaplacesDemon::p.interval(diag(S_gdp), prob = 0.95)
+
+sd(rowSums(S_gdp))
 LaplacesDemon::p.interval(c(S_gdp), prob = 0.95)
+
+
+sd(c(S_gdp[lower.tri(S_gdp) | upper.tri(S_gdp)]))
+LaplacesDemon::p.interval(c(S_gdp[lower.tri(S_gdp) | upper.tri(S_gdp)]), prob = 0.95)
+
+
+t.test(diag(S_gdp), mu = 0)$p.value
+t.test(rowSums(S_gdp), mu = 0)$p.value
+
+
 
 impacts
 methods(impacts)
 getS3method("impacts", "sarlm") 
 
+
+model3.SDM$insert
 
 #
 
