@@ -426,7 +426,7 @@ summary(model3.SDEM)$rsqr
 
 # SDM
 summary(
-        model3.SDM <- spml(net_assortativity ~ treatment_int : group + gdp + dird +
+        model3.SDM <- spml(share_local_nodes ~ treatment_int : group + gdp + dird +
                                    sub_region + sub_nat + sub_cee + treatment_int_SL : group +
                                    gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + 
                                    sub_cee_SL, data = df3, index = c("dep", "period"),
@@ -452,6 +452,42 @@ model3.SDM$coefficients[7]
 
 S_gdp <- iIrW %*% ((model3.SDM$coefficients[2] * diag(94)) - # diag(nrow(df3))
                            (model3.SDM$coefficients[7] * listw2mat(sp.matl)))
+
+
+### Bivand's answer 2
+Time <- length(unique(df3$period))
+N <- length(unique(df3$dep))
+
+library(Matrix)
+s.lws <- kronecker(Diagonal(Time) , listw2dgCMatrix(sp.matl))
+IrW <- Diagonal(N * Time) - model3.SDM$spat.coef * s.lws
+IrWi <- solve(IrW)
+S_gdp <- IrWi * (Diagonal(N * Time) * model3.SDM$coefficients[2] +
+                         s.lws * model3.SDM$coefficients[7])
+
+# diret impacts
+mean(diag(S_gdp))
+sd(diag(S_gdp))
+t.test(diag(S_gdp), mu = 0)$p.value
+LaplacesDemon::p.interval(diag(S_gdp), prob = 0.95)
+
+# total impacts
+mean(rowSums(S_gdp)) # sum(S_gdp)/376
+sd(rowSums(S_gdp))
+t.test(rowSums(S_gdp), mu = 0)$p.value
+LaplacesDemon::p.interval(rowSums(S_gdp), prob = 0.95)
+
+# indirect impacts
+mean(rowSums(S_gdp)) - mean(diag(S_gdp)) 
+        
+
+
+
+
+
+
+
+### Bivand's answer 1
 
 #S_gdp <- iIrW %*% (model3.SDM$coefficients[2] * diag(94)) # gives wrong impact got from impacts()
 
@@ -481,8 +517,15 @@ impacts
 methods(impacts)
 getS3method("impacts", "sarlm") 
 
+library(spatialreg)
+spatialreg::intImpacts
+spatialreg::lagDistrImpacts
+spatialreg::lagImpacts
+spatialreg::lagImpacts_e
 
-model3.SDM$insert
+MASS::mvrnorm
+
+matrix(c(10,3,3,2),2,2)
 
 #
 
