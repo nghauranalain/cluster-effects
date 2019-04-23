@@ -110,41 +110,40 @@ coeftest(model0, vcov = vcovHC, type = "HC1")
 
 
 
-
 ################################################################################
-################################################################## Estimations 1 
+############################################ Estimations 1 : fixed effects model 
 ################################################################################
 
 ### 1) Network embeddedness : density
 ## estimating the fixed effects regression with plm()
 model1 <- plm(net_density ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model1)
 coeftest(model1, vcov = vcovHC, type = "HC1")
 
 ### 1) Network embeddedness : fragmentation index
 model1 <- plm(fragmentation_index ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model1)
 coeftest(model1, vcov = vcovHC, type = "HC1")
 
 ### 1) Network embeddedness : share of the network’s main component
 model1 <- plm(share_net_main_comp ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model1)
 coeftest(model1, vcov = vcovHC, type = "HC1")
 
 ################################################################################
 
 ### 2) Network efficiency : clustering coefficient (ratio)
-model1 <- plm(CC_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+model1 <- plm(log(CC_ratio) ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model1)
 coeftest(model1, vcov = vcovHC, type = "HC1")
 
 ### 2) Network efficiency : average path length (ratio)
 model1 <- plm(PL_ratio ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model1)
 coeftest(model1, vcov = vcovHC, type = "HC1")
 
@@ -152,13 +151,13 @@ coeftest(model1, vcov = vcovHC, type = "HC1")
 
 ### 3) Network resilience : network hierarchy
 model1 <- plm(net_hierarchy ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model1)
 coeftest(model1, vcov = vcovHC, type = "HC1")
 
 ### 3) Network resilience : network assortativity
 model1 <- plm(net_assortativity ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model1)
 coeftest(model1, vcov = vcovHC, type = "HC1")
 
@@ -166,59 +165,58 @@ coeftest(model1, vcov = vcovHC, type = "HC1")
 
 ### 4) Network geographical anchoring : share of local nodes
 model1 <- plm(share_local_nodes ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model1)
 coeftest(model1, vcov = vcovHC, type = "HC1")
 
 ### 4) Network geographical anchoring : share of regional nodes
 model1 <- plm(share_regional_nodes ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model1)
 coeftest(model1, vcov = vcovHC, type = "HC1")
 
 ### 4) Network geographical anchoring : share of national nodes
 model1 <- plm(share_national_nodes ~ treatment_int + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model1)
 coeftest(model1, vcov = vcovHC, type = "HC1")
 
 
 
 ################################################################################
-################################################################## Estimations 2 
+######################################### Estimations 2: treatment heterogeneity 
 ################################################################################
 
 ### 1) Network embeddedness : density
 ## estimating the fixed effects regression with plm()
 model2 <- plm(net_density ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model2)
 coeftest(model2, vcov = vcovHC, type = "HC1")
 
 ### 1) Network embeddedness : fragmentation index
 model2 <- plm(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model2)
 coeftest(model2, vcov = vcovHC, type = "HC1")
-coeftest(model2, vcov = vcovHC(model2, type = "HC1", cluster = "group"))
 
 ### 1) Network embeddedness : share of the network’s main component
 model2 <- plm(share_net_main_comp ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model2)
 coeftest(model2, vcov = vcovHC, type = "HC1")
 
 ################################################################################
 
 ### 2) Network efficiency : clustering coefficient (ratio)
-model2 <- plm(CC_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+model2 <- plm(log(CC_ratio) ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model2)
 coeftest(model2, vcov = vcovHC, type = "HC1")
 
 ### 2) Network efficiency : average path length (ratio)
 model2 <- plm(PL_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model2)
 coeftest(model2, vcov = vcovHC, type = "HC1")
 
@@ -226,13 +224,13 @@ coeftest(model2, vcov = vcovHC, type = "HC1")
 
 ### 3) Network resilience : network hierarchy
 model2 <- plm(net_hierarchy ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model2)
 coeftest(model2, vcov = vcovHC, type = "HC1")
 
 ### 3) Network resilience : network assortativity
 model2 <- plm(net_assortativity ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model2)
 coeftest(model2, vcov = vcovHC, type = "HC1")
 
@@ -240,34 +238,100 @@ coeftest(model2, vcov = vcovHC, type = "HC1")
 
 ### 4) Network geographical anchoring : share of local nodes
 model2 <- plm(share_local_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model2)
 coeftest(model2, vcov = vcovHC, type = "HC1")
 
 ### 4) Network geographical anchoring : share of regional nodes
 model2 <- plm(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model2)
 coeftest(model2, vcov = vcovHC, type = "HC1")
 
 ### 4) Network geographical anchoring : share of national nodes
 model2 <- plm(share_national_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within", effect = "individual")
 summary(model2)
 coeftest(model2, vcov = vcovHC, type = "HC1")
 
+################################################################################
+################### Estimations 3 : Time fixed effects + treatment heterogeneity 
+################################################################################
+
+### 1) Network embeddedness : density
+## estimating the fixed effects regression with plm()
+model3 <- plm(net_density ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+summary(model3)
+coeftest(model3, vcov = vcovHC, type = "HC1")
+
+### 1) Network embeddedness : fragmentation index
+model3 <- plm(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+summary(model3)
+coeftest(model3, vcov = vcovHC, type = "HC1")
+
+### 1) Network embeddedness : share of the network’s main component
+model3 <- plm(share_net_main_comp ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+summary(model3)
+coeftest(model3, vcov = vcovHC, type = "HC1")
+
+################################################################################
+
+### 2) Network efficiency : clustering coefficient (ratio)
+model3 <- plm(log(CC_ratio) ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+summary(model3)
+coeftest(model3, vcov = vcovHC, type = "HC1")
+
+### 2) Network efficiency : average path length (ratio)
+model3 <- plm(PL_ratio ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+summary(model3)
+coeftest(model3, vcov = vcovHC, type = "HC1")
+
+################################################################################
+
+### 3) Network resilience : network hierarchy
+model3 <- plm(net_hierarchy ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+summary(model3)
+coeftest(model3, vcov = vcovHC, type = "HC1")
+
+### 3) Network resilience : network assortativity
+model3 <- plm(net_assortativity ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+summary(model3)
+coeftest(model3, vcov = vcovHC, type = "HC1")
+
+################################################################################
+
+### 4) Network geographical anchoring : share of local nodes
+model3 <- plm(share_local_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+summary(model3)
+coeftest(model3, vcov = vcovHC, type = "HC1")
+
+### 4) Network geographical anchoring : share of regional nodes
+model3 <- plm(share_regional_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+summary(model3)
+coeftest(model3, vcov = vcovHC, type = "HC1")
+
+### 4) Network geographical anchoring : share of national nodes
+model3 <- plm(share_national_nodes ~ treatment_int : group + gdp + dird + sub_region + sub_nat + sub_cee,
+              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+summary(model3)
+coeftest(model3, vcov = vcovHC, type = "HC1")
+
 
 
 ################################################################################
-################################################### Test spatial autocorrelation 
+###################################### Estimations 4: Spatial Durbin model (SDM) 
 ################################################################################
 library(splm)
 library(spdep)
-
-
-#data("Produc", package = "Ecdat")
-#data("usaww")
-
 
 glimpse(df1)
 df2 <- select(df1, -net_name, -region)
@@ -283,122 +347,6 @@ rowSums(sp.mat)
 sp.matl <- mat2listw(sp.mat, style = "W")
 
 
-## tests
-# RLMlag robust version
-slmtest(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region +
-                sub_nat + sub_cee,
-        data = df2, listw = sp.matl, model = "within", effect = "twoways",
-        test = "rlml")
-# RLMerr robust version
-slmtest(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region +
-                sub_nat + sub_cee,
-        data = df2, listw = sp.matl, model = "within", effect = "twoways",
-        test = "rlme")
-## choose the most significative test
-
-## models
-# SAR (for network spatial matrix)
-summary(
-        spml(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region +
-                     sub_nat + sub_cee,
-             data = df2, index = c("dep", "period"), model = "within", effect = "twoways",
-             lag = TRUE, listw = sp.matl, error = "none")
-)
-
-# SEM (for geo spatial matrix)
-summary(
-        spml(fragmentation_index ~ treatment_int : group + gdp + dird + sub_region +
-                     sub_nat + sub_cee,
-             data = df2, index = c("dep", "period"), model = "within", effect = "twoways",
-             lag = FALSE, listw = sp.matl, error = "b")
-)
-
-
-# function from Spatial_Econometrics_with_R (Prof. Dr. Reinhold Kosfeld)
-AICsplm = function(object, k=2, criterion=c("AIC", "BIC")){
-        sp = summary(object)
-        l = sp$logLik
-        np = length(coef(sp))
-        N = nrow(sp$model)
-        if (sp$effects=="sptpfe") {
-                n = length(sp$res.eff[[1]]$res.sfe)
-                T = length(sp$res.eff[[1]]$res.tfe)
-                np = np+n+T
-        }
-        if (sp$effects=="spfe") {
-                n = length(sp$res.eff[[1]]$res.sfe)
-                np = np+n+1
-        }
-        if (sp$effects=="tpfe") {
-                T = length(sp$res.eff[[1]]$res.tfe)
-                np = np+T+1
-        }
-        if(criterion=="AIC"){
-                aic = -2*l+k*np
-                names(aic) = "AIC"
-                return(aic)
-        }
-        if(criterion=="BIC"){
-                bic = -2*l+log(N)*np
-                names(bic) = "BIC"
-                return(bic)
-        }
-}
-
-
-# function from https://stackoverflow.com/questions/46186527/how-to-calculate-bic-and-aic-for-a-gmm-model-in-r-using-plm
-AICplm <- function(object, criterion) {
-        # object is "plm", "panelmodel" 
-        # Lets panel data has index :index = c("dep", "period")
-        
-        sp = summary(object)
-        
-        if(class(object)[1]=="plm"){
-                u.hat <- residuals(sp) # extract residuals
-                df <- cbind(as.vector(u.hat), attr(u.hat, "index"))
-                names(df) <- c("resid", "dep", "period")
-                c = length(levels(df$dep)) # extract country dimension 
-                t = length(levels(df$period)) # extract time dimension 
-                np = length(sp$coefficients[,1]) # number of parameters
-                n.N = nrow(sp$model) # number of data
-                s.sq  <- log( (sum(u.hat^2)/(n.N))) # log sum of squares
-                
-                # effect = c("individual", "time", "twoways", "nested"),
-                # model = c("within", "random", "ht", "between", "pooling", "fd")
-                
-                # I am making example only with some of the versions:
-                
-                if (sp$args$model == "within" & sp$args$effect == "individual"){
-                        n = c
-                        np = np+n+1 # update number of parameters
-                }
-                
-                if (sp$args$model == "within" & sp$args$effect == "time"){
-                        T = t
-                        np = np+T+1 # update number of parameters
-                }
-                
-                if (sp$args$model == "within" & sp$args$effect == "twoways"){
-                        n = c
-                        T = t
-                        np = np+n+T # update number of parameters
-                }
-                aic <- round(2*np  +  n.N * (log(2*pi) + s.sq  + 1 ),1)
-                bic <- round(log(n.N)*np  +  n.N * (log(2*pi) + s.sq  + 1 ), 1)
-                
-                if(criterion=="AIC"){
-                        names(aic) = "AIC"
-                        return(aic)
-                }
-                if(criterion=="BIC"){
-                        names(bic) = "BIC"
-                        return(bic)
-                }
-        }
-}
-
-
-
 # SDM (for geo spatial matrix)
 glimpse(df2)
 df3 <- pdata.frame(df2, index = c("dep", "period"))
@@ -411,47 +359,36 @@ df3$sub_cee_SL <- slag(df3$sub_cee, sp.matl)
 glimpse(df3)
 colnames(df3)
 
-# SDEM
-summary(
-        model3.SDEM <- spml(net_hierarchy ~ treatment_int : group + gdp + dird +
-                                    sub_region + sub_nat + sub_cee + treatment_int_SL : group +
-                                    gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + 
-                                    sub_cee_SL,
-                       data = df3, index = c("dep", "period"), model = "within",
-                       effect = "twoways", lag = FALSE, listw = sp.matl, spatial.error = "b",
-                       LeeYu = TRUE, Hess = FALSE)
-        )
-summary(model3.SDEM)$rsqr
-
 
 # SDM
 summary(
-        model3.SDM <- spml(share_local_nodes ~ treatment_int : group + gdp + dird +
+        model4 <- spml(net_density ~ treatment_int : group + gdp + dird +
                                    sub_region + sub_nat + sub_cee + treatment_int_SL : group +
                                    gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + 
                                    sub_cee_SL, data = df3, index = c("dep", "period"),
                            model = "within", effect = "twoways", lag = TRUE,
                            listw = sp.matl, spatial.error = "none", LeeYu = TRUE, Hess = FALSE)
         )
-summary(model3.SDM)$rsqr
+summary(model4)$rsqr
+effects.splm(model4)
 
 
 ## calculate impact measures
 time <- length(unique(df3$period))
 set.seed(1234)
-imps <- impacts(model3.SDM, listw = sp.matl, time = time)
-impacts(model3.SDM)
+imps <- impacts(model4, listw = sp.matl, time = time)
+impacts(model4)
 summary(imps, zstats = TRUE, short = TRUE)
 
 # test
-model3.SDM$spat.coef
-iIrW  <- invIrW(sp.matl, model3.SDM$spat.coef)
-model3.SDM$coefficients
-model3.SDM$coefficients[2]
-model3.SDM$coefficients[7]
+model4$spat.coef
+iIrW  <- invIrW(sp.matl, model4$spat.coef)
+model4$coefficients
+model4$coefficients[2]
+model4$coefficients[7]
 
-S_gdp <- iIrW %*% ((model3.SDM$coefficients[2] * diag(94)) - # diag(nrow(df3))
-                           (model3.SDM$coefficients[7] * listw2mat(sp.matl)))
+S_gdp <- iIrW %*% ((model4$coefficients[2] * diag(94)) - # diag(nrow(df3))
+                           (model4$coefficients[7] * listw2mat(sp.matl)))
 
 
 ### Bivand's answer 2
@@ -460,10 +397,10 @@ N <- length(unique(df3$dep))
 
 library(Matrix)
 s.lws <- kronecker(Diagonal(Time) , listw2dgCMatrix(sp.matl))
-IrW <- Diagonal(N * Time) - model3.SDM$spat.coef * s.lws
+IrW <- Diagonal(N * Time) - model4$spat.coef * s.lws
 IrWi <- solve(IrW)
-S_gdp <- IrWi * (Diagonal(N * Time) * model3.SDM$coefficients[2] +
-                         s.lws * model3.SDM$coefficients[7])
+S_gdp <- IrWi * (Diagonal(N * Time) * model4$coefficients[2] +
+                         s.lws * model4$coefficients[7])
 
 # diret impacts
 mean(diag(S_gdp))
@@ -489,7 +426,7 @@ mean(rowSums(S_gdp)) - mean(diag(S_gdp))
 
 ### Bivand's answer 1
 
-#S_gdp <- iIrW %*% (model3.SDM$coefficients[2] * diag(94)) # gives wrong impact got from impacts()
+#S_gdp <- iIrW %*% (model4$coefficients[2] * diag(94)) # gives wrong impact got from impacts()
 
 # Then you can get the direct and total impacts in the usual way: 
 dir_gdp <-  mean(diag(S_gdp)) # or sum(diag(S_gdp))/94
@@ -557,16 +494,16 @@ model3.SAR$logLik
 
 ### Models comparison: SDM vs SAR and SDM vs SLX
 ## SDM vs SAR 
-AICsplm(model3.SDM, criterion = "AIC")
+AICsplm(model4, criterion = "AIC")
 AICsplm(model3.SAR, criterion = "AIC")
-AICsplm(model3.SDM, criterion = "BIC")
+AICsplm(model4, criterion = "BIC")
 AICsplm(model3.SAR, criterion = "BIC")
 # SDM wins SAR
 
 ## SDM vs SLX 
-AICsplm(model3.SDM, criterion = "AIC")
+AICsplm(model4, criterion = "AIC")
 AICplm(model3.SLX, criterion = "AIC")
-AICsplm(model3.SDM, criterion = "BIC")
+AICsplm(model4, criterion = "BIC")
 AICplm(model3.SLX, criterion = "BIC")
 #
 
