@@ -50,6 +50,13 @@ grps <- read.csv("T:/These_GATE/Paper_2/Controls/Data Eurolio/Data/donnees_depar
 glimpse(grps)
 grps <- select(grps, dep, groupe)
 grps$dep <- ifelse(nchar(grps$dep) == 1, paste0("0", grps$dep), grps$dep)
+# change group name
+grps <- grps %>% mutate(groupe = case_when(
+        groupe == "3" ~ "G1",
+        groupe == "2" ~ "G2",
+        groupe == "4" ~ "G3",
+        groupe == "1" ~ "G4")
+        )
 controls <- controls %>% left_join(grps, by = "dep")
 colnames(controls)[10] <- "group"
 # save grps for plot
@@ -336,6 +343,19 @@ library(spdep)
 glimpse(df1)
 df2 <- select(df1, -net_name, -region)
 glimpse(df2)
+
+################################################### STOP : export df2 for MATLAB
+str(df2)
+df2.matlab <- df2
+df2.matlab <- df2.matlab[, c(2, 1, 3:27)]
+str(df2.matlab)
+df2.matlab <- df2.matlab %>% arrange(period, dep)
+# export en xls
+library(xlsx)
+write.xlsx(df2.matlab, "T:/These_GATE/Paper_2/Estimation1/df.xls",
+           row.names = F)
+
+################################################################################
 
 sp.mat <- read.table("../spatial_matrix.txt")
 #sp.mat <- read.table("../net_matrix2.txt")
