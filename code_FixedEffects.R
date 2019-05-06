@@ -105,6 +105,33 @@ library(AER)
 library(tseries)
 library(lmtest)
 
+################################################################################
+######################################################### Descriptive statistics 
+################################################################################
+glimpse(df1)
+
+## data for descriptive statistics  
+df1.desc <- df1 %>% select(region, period, group, # independent variables
+                           gdp, dird, sub_region, sub_nat, sub_cee, treatment_int, 
+                           net_density, fragmentation_index, share_net_main_comp, # dependent variables
+                           CC_ratio, PL_ratio, net_hierarchy, net_assortativity,
+                           share_local_nodes, share_regional_nodes, share_national_nodes)
+
+df1.desc$CC_ratio <- log(df1.desc$CC_ratio)
+glimpse(df1.desc)
+
+## global per period
+mat1 <- psych::describeBy(df1.desc$share_national_nodes, df1.desc$period, digits = 5, mat = T)[, -c(1, 3)]
+colnames(mat1)[1] <- "period"
+row.names(mat1) <- NULL
+mat1
+
+## group per period
+mat2 <- psych::describeBy(df1.desc$share_national_nodes, list(df1.desc$period, df1.desc$group),
+                          digits = 5, mat = T)[, -c(1, 4)]
+colnames(mat2)[1:2] <- c("period", "group")
+row.names(mat2) <- NULL
+mat2
 
 
 ########################################################################## TEST
