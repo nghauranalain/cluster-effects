@@ -139,7 +139,8 @@ mat2
 model0 <- plm(log(nb_patents) ~ gdp + dird + sub_region + sub_nat + sub_cee +
                       net_density + fragmentation_index + share_net_main_comp +
                       CC_actual + PL_actual + share_local_nodes + share_regional_nodes,
-              data = df1, index = c("region", "period"), model = "within", effect = "twoways")
+              data = df1, index = c("region", "period"), model = "within",
+              effect = "twoways")
 summary(model0)
 coeftest(model0, vcov = vcovHC, type = "HC1")
 
@@ -378,9 +379,20 @@ df2.matlab <- df2
 df2.matlab <- df2.matlab[, c(2, 1, 3:27)]
 str(df2.matlab)
 df2.matlab <- df2.matlab %>% arrange(period, dep)
+
+# KSI data
+ksi <- read.csv("T:/These_GATE/Paper_2/KSI/KSI.csv")
+ksi$dep <- ifelse(nchar(ksi$dep) == 1, paste0("0", ksi$dep), ksi$dep)
+ksi$dep  <- as.factor(ksi$dep)
+ksi$period <- as.factor(ksi$period)
+
+# join df2.matlab and KSI data
+glimpse(df2.matlab)
+glimpse(ksi)
+df2.matlab <- left_join(df2.matlab, ksi, by = c("period", "dep"))
 # export en xls
 library(xlsx)
-write.xlsx(df2.matlab, "T:/These_GATE/Paper_2/Estimation1/df.xls",
+write.xlsx(df2.matlab, "T:/These_GATE/Paper_2/Estimation1/df_with_ksi.xls",
            row.names = F)
 
 ################################################################################
