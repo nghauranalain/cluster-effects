@@ -423,13 +423,13 @@ colnames(df3)
 
 # SDM
 summary(
-        model4 <- spml(net_density ~ treatment_int : group + gdp + dird +
+        model4 <- spml(net_density ~ treatment_int : period + gdp + dird +
                                    sub_region + sub_nat + sub_cee + treatment_int_SL : group +
                                    gdp_SL + dird_SL + sub_region_SL + sub_nat_SL + 
                                    sub_cee_SL, data = df3, index = c("dep", "period"),
                            model = "within", effect = "twoways", lag = TRUE,
                            listw = sp.matl, spatial.error = "none", LeeYu = TRUE, Hess = FALSE)
-        )
+        ) # error (singular x matrix) if we use period as group
 summary(model4)$rsqr
 effects.splm(model4)
 
